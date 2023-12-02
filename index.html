@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AJAX Form</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>User Details</h1>
+  <form id="dataForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" placeholder="Name"><br><br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" placeholder="Email"><br><br>
+
+    <label for="contact">Contact:</label>
+    <input type="text" id="contact" placeholder="Contact"><br><br>
+
+    <label for="name">Name:</label>
+    <input type="text" id="native" placeholder="Native"><br><br>
+
+    <button type="button" onclick="saveData()">Submit</button>
+    <button type="button" id="updateBtn" style="display: none;" onclick="updateData()">Update</button>
+  </form>
+<br><br>
+  <table id="dataTable" border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Contact</th>
+        <th>Native</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <!-- Data will be displayed here -->
+    </tbody>
+  </table>
+
+  <script>
+    function deleteRow(row) {
+      $(row).closest('tr').remove();
+      // Perform AJAX delete operation here
+    }
+
+    function editRow(row) {
+      var cells = $(row).find('td');
+      var name = $(cells[0]).text();
+      var email = $(cells[1]).text();
+      var contact = $(cells[2]).text();
+      var native = $(cells[3]).text();
+
+      $('#name').val(name);
+      $('#email').val(email);
+      $('#contact').val(contact);
+      $('#native').val(native);
+
+      $('#updateBtn').show().data('row', row); // Store the row for update
+    }
+
+    function updateData() {
+      var row = $('#updateBtn').data('row');
+      var cells = $(row).find('td');
+
+      var name = $('#name').val();
+      var email = $('#email').val();
+      var contact = $('#contact').val();
+      var native = $('#native').val();
+
+      $(cells[0]).text(name);
+      $(cells[1]).text(email);
+      $(cells[2]).text(contact);
+      $(cells[3]).text(native);
+
+      $('#updateBtn').hide();
+
+      // Perform AJAX update operation here
+      // Reset the form after successful update
+      $('#dataForm')[0].reset();
+    }
+
+    function saveData() {
+      var name = document.getElementById('name').value;
+      var email = document.getElementById('email').value;
+      var contact = document.getElementById('contact').value;
+      var native = document.getElementById('native').value;
+
+      $.ajax({
+        url: 'process.php',
+        type: 'POST',
+        data: {
+          action: 'save',
+          name: name,
+          email: email,
+          contact: contact,
+          native: native
+        },
+        success: function(response) {
+          $('#tableBody').append(response);
+          $('#dataForm')[0].reset(); // Reset the form after successful save
+        }
+      });
+    }
+  </script>
+</body>
+</html>
